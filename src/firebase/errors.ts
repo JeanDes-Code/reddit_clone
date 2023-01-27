@@ -25,4 +25,6 @@ export const FIREBASE_ERRORS = {
     'This credential is already associated with a different user account.',
   'Firebase: Error (auth/invalid-credential).':
     'The supplied auth credential is malformed or has expired.',
+  'Firebase: Error (auth/popup-closed-by-user).':
+    'You closed the popup before completing the sign-in process.',
 };

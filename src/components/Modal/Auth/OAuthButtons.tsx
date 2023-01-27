@@ -2,6 +2,7 @@ import { Flex, Button, Image, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase/clientApp';
+import { FIREBASE_ERRORS } from '@/firebase/errors';
 
 const OAuthButtons: React.FC = () => {
   const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
@@ -18,7 +19,11 @@ const OAuthButtons: React.FC = () => {
         Continue with Google
       </Button>
       <Button variant="oauth"> Some Other Providers </Button>
-      {error && <Text>{error.message}</Text>}
+      {error && (
+        <Text textAlign="center" color="red" fontSize="10pt">
+          {FIREBASE_ERRORS[error?.message as keyof typeof FIREBASE_ERRORS]}
+        </Text>
+      )}
     </Flex>
   );
 };
