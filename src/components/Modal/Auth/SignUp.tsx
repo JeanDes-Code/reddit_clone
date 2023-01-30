@@ -16,7 +16,6 @@ const SignUp: React.FC = () => {
   });
   const [error, setError] = useState('');
 
-
   //Firebase
   const [createUserWithEmailAndPassword, user, loading, userError] =
     useCreateUserWithEmailAndPassword(auth);
