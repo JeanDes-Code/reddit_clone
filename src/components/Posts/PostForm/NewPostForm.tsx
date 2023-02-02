@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Flex, Icon, Text } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  CloseButton,
+  Flex,
+  Icon,
+  Text,
+} from '@chakra-ui/react';
 import { BiPoll } from 'react-icons/bi';
 import { BsLink45Deg, BsMic } from 'react-icons/bs';
 import { IoDocumentText, IoImageOutline } from 'react-icons/io5';
@@ -8,8 +17,8 @@ import { User } from 'firebase/auth';
 import { useRouter } from 'next/router';
 
 import TabItem from './TabItem';
-import TextInputs from './PostForm/TextInputs';
-import ImageUpload from './PostForm/ImageUpload';
+import TextInputs from './TextInputs';
+import ImageUpload from './ImageUpload';
 import { Post } from '@/atoms/postsAtom';
 import {
   addDoc,
@@ -62,8 +71,10 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
   });
   const [selectedFile, setSelectedFile] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleCreatePost = async () => {
+    if (error) setError(false);
     const { communityId } = router.query;
 
     // create new post object => type Post
@@ -95,12 +106,13 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
           imageURL: downloadURL,
         });
       }
+      // redirect the user back to the community page using next/router
+      router.back();
     } catch (error: any) {
       console.log('handleCreatePost error: ', error.message);
+      setError(true);
     } finally {
       setLoading(false);
-      // redirect the user back to the community page using next/router
-      //router.back();
     }
   };
 
@@ -180,13 +192,18 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
           <Flex direction="column" width="100%" align="center" justify="center">
             <Flex>
               <Text>
-                {' '}
                 <strong>Talk</strong> functionality is not available yet
               </Text>
             </Flex>
           </Flex>
         )}
       </Flex>
+      {error && (
+        <Alert status="error">
+          <AlertIcon />
+          <Text mr={2}>Error creating post</Text>
+        </Alert>
+      )}
     </Flex>
   );
 };
