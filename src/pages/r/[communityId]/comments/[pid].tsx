@@ -1,4 +1,5 @@
-import React, { useLayoutEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from 'react';
 import PageContent from '@/components/Layout/PageContent';
 import PostItem from '@/components/Posts/PostItem';
 import usePosts from '@/hooks/usePosts';
@@ -9,6 +10,8 @@ import { doc, getDoc } from 'firebase/firestore';
 import { Post } from '@/atoms/postsAtom';
 import About from '@/components/Community/About';
 import useCommunityData from '@/hooks/useCommunityData';
+import Comments from '@/components/Posts/Comments';
+import { User } from 'firebase/auth';
 
 const PostPage = () => {
   const [user] = useAuthState(auth);
@@ -33,7 +36,7 @@ const PostPage = () => {
     }
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const { pid } = router.query;
     if (pid && !postStateValue.selectedPost) {
       fetchPost(pid as string);
@@ -56,7 +59,12 @@ const PostPage = () => {
             userIsCreator={user?.uid === postStateValue.selectedPost?.creatorId}
           />
         )}
-        {/* PostComments */}
+
+        <Comments
+          user={user as User}
+          selectedPost={postStateValue.selectedPost!}
+          communityId={postStateValue.selectedPost?.communityId as string}
+        />
       </>
       <>
         {communityStateValue.currentCommunity && (
