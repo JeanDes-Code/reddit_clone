@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { Post, postState, PostVote } from '@/atoms/postsAtom';
@@ -16,14 +17,23 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
 import { communityState } from '@/atoms/communitiesAtom';
 import { authModalState } from '@/atoms/authModalAtom';
+import { useRouter } from 'next/router';
 
 const usePosts = () => {
   const [user] = useAuthState(auth);
+  const router = useRouter();
   const [postStateValue, setPostStateValue] = useRecoilState(postState);
   const currentCommunity = useRecoilValue(communityState).currentCommunity;
   const setAuthModalState = useSetRecoilState(authModalState);
 
-  const onVote = async (post: Post, vote: number, communityId: string) => {
+  const onVote = async (
+    event: React.MouseEvent<SVGElement, MouseEvent>,
+    post: Post,
+    vote: number,
+    communityId: string,
+  ) => {
+    event.stopPropagation();
+
     //check for a user => if not, open auth modal
     if (!user?.uid) {
       setAuthModalState({ open: true, view: 'login' });
@@ -106,6 +116,7 @@ const usePosts = () => {
         }
       }
       //update post document in db
+
       const postRef = doc(firestore, 'posts', post.id!);
       batch.update(postRef, { voteStatus: voteStatus + voteChange });
 
@@ -123,12 +134,26 @@ const usePosts = () => {
         posts: updatedPosts,
         postVotes: updatedPostVotes,
       }));
+
+      if (postStateValue.selectedPost) {
+        setPostStateValue((prev) => ({
+          ...prev,
+          selectedPost: updatedPost,
+        }));
+      }
     } catch (error: any) {
       console.log('onVote error: ', error.message);
     }
   };
 
-  const onSelectPost = () => {};
+  const onSelectPost = (post: Post) => {
+    setPostStateValue((prev) => ({
+      ...prev,
+      selectedPost: post,
+    }));
+
+    router.push(`/r/${post.communityId}/comments/${post.id}`);
+  };
 
   const onDeletePost = async (post: Post): Promise<boolean> => {
     try {
@@ -147,7 +172,8 @@ const usePosts = () => {
       }));
 
       return true;
-    } catch (error) {
+    } catch (error:any) {
+      console.log('onDeletePost error: ', error.message);
       return false;
     }
   };
