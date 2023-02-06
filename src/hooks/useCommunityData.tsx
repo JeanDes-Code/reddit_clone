@@ -76,6 +76,7 @@ const useCommunityData = () => {
       const newSnippet: CommunitySnippet = {
         communityId: communityData.id,
         imageURL: communityData.imageURL || '',
+        isModerator: user?.uid === communityData.creatorId, // if creator leaves the community, he should be set back to admin when he join back
       };
       batch.set(
         doc(
