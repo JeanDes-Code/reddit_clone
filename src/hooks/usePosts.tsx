@@ -172,7 +172,7 @@ const usePosts = () => {
       }));
 
       return true;
-    } catch (error:any) {
+    } catch (error: any) {
       console.log('onDeletePost error: ', error.message);
       return false;
     }
