@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  defaultMenuItem,
   DirectoryMenuItem,
   directoryMenuState,
 } from '@/atoms/directoryMenuAtom';
@@ -20,27 +21,42 @@ const useDirectory = () => {
   };
 
   const onSelectMenuItem = (menuItem: DirectoryMenuItem) => {
-    setDirectoryState((prev) => ({ ...prev, selectedMenuItem: menuItem }));
+    setDirectoryState((prev) => ({
+      ...prev,
+      selectedMenuItem: menuItem,
+    }));
 
-    router.push(menuItem.link);
-    if (directoryState.isOpen) toggleMenuOpen();
+    router?.push(menuItem.link);
+    if (directoryState.isOpen) {
+      toggleMenuOpen();
+    }
   };
 
   useEffect(() => {
-    const { currentCommunity } = communityStateValue;
+    const { community } = router.query;
 
-    if (currentCommunity) {
+    // const existingCommunity =
+    //   communityStateValue.visitedCommunities[community as string];
+
+    const existingCommunity = communityStateValue.currentCommunity;
+
+    if (existingCommunity.id) {
       setDirectoryState((prev) => ({
         ...prev,
         selectedMenuItem: {
-          displayText: `r/${currentCommunity.id}`,
-          link: `/r/${currentCommunity.id}`,
-          imageURL: currentCommunity.imageURL,
+          displayText: `r/${existingCommunity.id}`,
+          link: `r/${existingCommunity.id}`,
           icon: FaReddit,
           iconColor: 'blue.500',
+          imageURL: existingCommunity.imageURL,
         },
       }));
+      return;
     }
+    setDirectoryState((prev) => ({
+      ...prev,
+      selectedMenuItem: defaultMenuItem,
+    }));
   }, [communityStateValue.currentCommunity]);
 
   return {
