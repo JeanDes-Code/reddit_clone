@@ -12,7 +12,7 @@ import {
   where,
 } from 'firebase/firestore';
 import usePosts from '@/hooks/usePosts';
-import { Post } from '@/atoms/postsAtom';
+import { Post, PostVote } from '@/atoms/postsAtom';
 import PostLoader from '@/components/Posts/PostLoader';
 import { Stack } from '@chakra-ui/react';
 import PostItem from '@/components/Posts/PostItem';
@@ -95,7 +95,30 @@ const Home: NextPage = () => {
     }
   };
 
-  const getUserPostVotes = () => {};
+  const getUserPostVotes = async () => {
+    try {
+      const postIds = postStateValue.posts.map((post) => post.id);
+
+      const postVotesQuery = query(
+        collection(firestore, `users/${user?.uid}/postVotes`),
+        where('postId', 'in', postIds),
+      );
+
+      const postVotesDocs = await getDocs(postVotesQuery);
+
+      const postVotes = postVotesDocs.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPostStateValue((prev) => ({
+        ...prev,
+        postVotes: postVotes as PostVote[],
+      }));
+    } catch (error: any) {
+      console.log('getUserPostVotes error: ', error);
+    }
+  };
 
   //useEffects
 
@@ -112,12 +135,26 @@ const Home: NextPage = () => {
   }, [user, loadingUser]);
 
   useEffect(() => {
+    if (user && postStateValue.posts.length) {
+      getUserPostVotes();
+    }
+
+    return () => {
+      setPostStateValue((prev) => ({
+        ...prev,
+        postVotes: [],
+      }));
+    };
+  }, [user, postStateValue.posts]);
+
+  useEffect(() => {
     if (communityStateValue.currentCommunity.id) {
       setCommunityStateValue((prev) => ({
         ...prev,
         currentCommunity: defaultCommunity,
       }));
     }
+    //reset current community when user navigates to home page
   }, [communityStateValue.currentCommunity.id]);
 
   return (
