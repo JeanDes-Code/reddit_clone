@@ -1,4 +1,4 @@
-# Reddit Clone - `reddit-clone-yt`
+# Reddit Clone
 
 ## Introduction
 Welcome to the GitHub repository of our Reddit clone, `reddit-clone-yt`. This project is a tribute to the functionality and design of Reddit, focusing on a modern, responsive user interface and efficient data handling.
